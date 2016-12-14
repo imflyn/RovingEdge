@@ -11,4 +11,3 @@ def crawl_bus_route(result):
 deferred = defer.Deferred()
 deferred.addCallback(crawl_bus_route)
 deferred.callback('')
-reactor.run()

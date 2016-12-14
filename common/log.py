@@ -7,6 +7,8 @@ SAVE_PATH = dirname(dirname(__file__))
 logger = logging.getLogger()
 formatter = logging.Formatter('\n%(asctime)s - %(name)s - %(levelname)s \n%(message)s')
 
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s')
+
 error_handler = logging.FileHandler(SAVE_PATH + '/error.log', encoding='utf-8')
 error_handler.setLevel(logging.ERROR)
 error_handler.setFormatter(formatter)
