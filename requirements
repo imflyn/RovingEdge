@@ -3,3 +3,4 @@ flask
 selenium
 flask-RESTful
 requests
+pymongo

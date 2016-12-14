@@ -1,11 +1,15 @@
 from lxml import etree
 
+from common import mongodb_service
 from common import utils
+from crawler.core import config
 from crawler.core import constants
 from crawler.model.bus_route import BusRoute
 
 
 class BusRouteService(object):
+	TABLE_NAME = 'bus_route'
+
 	def __init__(self):
 		pass
 
@@ -38,3 +42,8 @@ class BusRouteService(object):
 				bus_route.stations = stations.split('、')
 			bus_route_list.append(bus_route)
 		return bus_route_list
+
+	def save_bus_route_data_to_db(self, bus_route_list):
+		collection = mongodb_service.get_collection(config.mongodb, self.TABLE_NAME)
+		mongodb_service.insert(collection, bus_route_list)
+		# TODO need test
