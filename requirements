@@ -4,3 +4,4 @@ selenium
 flask-RESTful
 requests
 pymongo
+twisted
