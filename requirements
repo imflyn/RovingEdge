@@ -1,3 +1,5 @@
 lxml
 flask
 selenium
+flask-RESTful
+requests
