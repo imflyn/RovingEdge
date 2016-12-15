@@ -52,7 +52,9 @@ class BusRouteService(object):
 			data.append(bus_route.__dict__)
 		# 删除整个表的数据再批量插入
 		mongodb_service.delete_all_data(collection)
+		log.info('爬取公交线路-->删除数据库中原有数据成功')
 		mongodb_service.insert_all(collection, data)
+		log.info('爬取公交线路-->数据插入数据库成功')
 
 	def crawl_bus_route_data(self):
 		log.info('爬取公交线路开始')
