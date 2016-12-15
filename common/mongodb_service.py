@@ -10,7 +10,7 @@ MAX_POOL_SIZE = 5
 def get_client(host: str, port: int) -> MongoClient:
     try:
         client = MongoClient(host, port, maxPoolSize=MAX_POOL_SIZE)
-        log.info("Connected successfully!!!")
+        log.info("Mongodb Connected successfully!!!")
         return client
     except errors.ConnectionFailure as e:
         log.error(e)
