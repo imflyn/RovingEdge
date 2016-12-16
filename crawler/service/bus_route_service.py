@@ -8,7 +8,8 @@ from crawler.model.bus_route import BusRoute
 
 
 class BusRouteService(object):
-	TABLE_NAME = 'bus_route'
+	TABLE_BUS_ROUTE = 'bus_route'
+	TABLE_BUS_STATION_ALL = 'bus_station_all'
 
 	def __init__(self):
 		pass
@@ -46,7 +47,7 @@ class BusRouteService(object):
 		return bus_route_list
 
 	def save_bus_route_data_to_db(self, bus_route_list):
-		collection = mongodb_service.get_collection(config.mongodb, self.TABLE_NAME)
+		collection = mongodb_service.get_collection(config.mongodb, self.TABLE_BUS_ROUTE)
 		data = []
 		for bus_route in bus_route_list:
 			data.append(bus_route.__dict__)
@@ -65,7 +66,20 @@ class BusRouteService(object):
 			log.info('处理公交线路数据成功')
 			self.save_bus_route_data_to_db(bus_route_list)
 			log.info('爬取公交线路成功')
-			return bus_route_list
+			self.save_station_list_to_db(bus_route_list)
 		except Exception as e:
 			log.info('爬取公交线路失败')
 			log.error(e)
+
+	def save_station_list_to_db(self, bus_route_list):
+		log.info('爬取公交线路-->去除重复公交站台开始')
+		bus_station_list = []
+		for bus_route in bus_route_list:
+			bus_station_list.extend(bus_route.stations)
+		bus_station_list = list(set(bus_station_list))
+		log.info('爬取公交线路-->去除重复公交站台成功')
+		collection = mongodb_service.get_collection(config.mongodb, self.TABLE_BUS_STATION_ALL)
+		mongodb_service.delete_all_data(collection)
+		log.info('爬取公交线路-->删除旧公交站台集合数据成功')
+		mongodb_service.insert(collection, {'bus_station_list': bus_station_list})
+		log.info('爬取公交线路-->保存公交站台集合数据成功')
