@@ -65,6 +65,7 @@ class BusRouteService(object):
 			log.info('处理公交线路数据成功')
 			self.save_bus_route_data_to_db(bus_route_list)
 			log.info('爬取公交线路成功')
+			return bus_route_list
 		except Exception as e:
 			log.info('爬取公交线路失败')
 			log.error(e)
