@@ -57,7 +57,7 @@ class BusRouteService(object):
 		mongodb_service.insert_all(collection, data)
 		log.info('爬取公交线路-->数据插入数据库成功')
 
-	def crawl_bus_route_data(self):
+	def crawl_bus_route_data(self) -> []:
 		log.info('爬取公交线路开始')
 		try:
 			bus_route_xml = self.request_bus_route_data()
@@ -66,7 +66,8 @@ class BusRouteService(object):
 			log.info('处理公交线路数据成功')
 			self.save_bus_route_data_to_db(bus_route_list)
 			log.info('爬取公交线路成功')
-			self.save_station_list_to_db(bus_route_list)
+			bus_station_list = self.save_station_list_to_db(bus_route_list)
+			return bus_station_list
 		except Exception as e:
 			log.info('爬取公交线路失败')
 			log.error(e)
@@ -83,3 +84,4 @@ class BusRouteService(object):
 		log.info('爬取公交线路-->删除旧公交站台集合数据成功')
 		mongodb_service.insert(collection, {'bus_station_list': bus_station_list})
 		log.info('爬取公交线路-->保存公交站台集合数据成功')
+		return bus_station_list

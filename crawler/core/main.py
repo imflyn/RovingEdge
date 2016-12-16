@@ -1,4 +1,8 @@
+from twisted.internet import reactor
+from twisted.internet.defer import Deferred
+
 from crawler.service.bus_route_service import BusRouteService
+from crawler.service.bus_station_service import BusStationService
 
 
 def crawl_bus_route():
@@ -7,11 +11,30 @@ def crawl_bus_route():
 	return bus_route_list
 
 
-def crawl_bus_station():
+def crawl_bus_station(bus_station_list):
+	def crawl_bus_station(bus_station) -> Deferred:
+		defer = Deferred()
+		bus_station_service = BusStationService()
+		bus_station_service.crawl_bus_station_data(bus_station)
+		return defer
 
-	pass
+	def task():
+		def callbacks_finished(_):
+			callbacks_finished.count += 1
+			if callbacks_finished.count == len(bus_station_list):
+				reactor.stop()
+
+		callbacks_finished.count = 0
+
+		for bus_station_entry in bus_station_list:
+			defer = crawl_bus_station(bus_station_entry)
+			defer.addBoth(callbacks_finished)
+			defer.callback('')
+
+	reactor.callWhenRunning(task)
+	reactor.run()
 
 
 if __name__ == '__main__':
-	crawl_bus_route()
-	crawl_bus_station()
+	bus_station_list = crawl_bus_route()
+	crawl_bus_station(bus_station_list)
