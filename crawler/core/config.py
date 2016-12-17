@@ -17,4 +17,5 @@ PORT = 27017
 # MongoDB
 mongodb = mongodb_service.get_db(mongodb_service.get_client(HOST, PORT), DATABASE_NAME)
 
-phantomjs_path = 'D:\Development\python3\Scripts\phantomjs.exe'
+# phantomjs_path = 'D:\Development\python3\Scripts\phantomjs.exe'
+phantomjs_path = 'C:\Flyn\Development\SDK\python3\Scripts\phantomjs.exe'
