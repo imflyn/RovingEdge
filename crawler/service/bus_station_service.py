@@ -58,6 +58,16 @@ class BusStationService(object):
         log.info('爬取公交站台-->处理<{station_name}>站台信息成功，获得<{station_count}>个站台信息'.format(station_name=station_name, station_count=len(station_list)))
         return station_list
 
+    def request_bus_station_data2(self, station_name):
+        #TODO
+        # http://www.szjt.gov.cn/BusQuery/default.aspx?cid=175ecd8d-c39d-4116-83ff-109b946d7cb4
+        # ctl00$MainContent$StandName 团结桥
+        # ctl00$MainContent$SearchCode 搜索
+        # __VIEWSTATE /wEPDwULLTE5ODM5MjcxNzlkZAmiJJ2tnI/uORAHha02uiTP20zkcIPFI/03+QRVt2jm
+        # __VIEWSTATEGENERATOR 1DDAEB65
+        # __EVENTVALIDATION /wEWBQLCvY65BALq+uyKCAKkmJj/DwL0+sTIDgLl5vKEDsL/hpJTaG5nWiRLbcu6Hd+JXovreFUihHtwVJ7zNsPc
+        pass
+
     def request_bus_station_data(self, station_name):
         driver = webdriver.PhantomJS(executable_path=config.phantomjs_path, service_args=['--load-images=no'])
         # driver = webdriver.Chrome()
