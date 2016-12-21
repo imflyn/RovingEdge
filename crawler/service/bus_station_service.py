@@ -1,11 +1,8 @@
 import collections
-import time
 
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from lxml.etree import XPathEvalError
-from selenium import webdriver
-from selenium.common.exceptions import TimeoutException
 
 from common import log, mongodb_service, utils
 from crawler.core import config
@@ -58,32 +55,41 @@ class BusStationService(object):
         log.info('爬取公交站台-->处理<{station_name}>站台信息成功，获得<{station_count}>个站台信息'.format(station_name=station_name, station_count=len(station_list)))
         return station_list
 
-    def request_bus_station_data2(self, station_name):
-        #TODO
+    def request_bus_station_data(self, station_name):
+        # TODO
         # http://www.szjt.gov.cn/BusQuery/default.aspx?cid=175ecd8d-c39d-4116-83ff-109b946d7cb4
         # ctl00$MainContent$StandName 团结桥
         # ctl00$MainContent$SearchCode 搜索
         # __VIEWSTATE /wEPDwULLTE5ODM5MjcxNzlkZAmiJJ2tnI/uORAHha02uiTP20zkcIPFI/03+QRVt2jm
         # __VIEWSTATEGENERATOR 1DDAEB65
         # __EVENTVALIDATION /wEWBQLCvY65BALq+uyKCAKkmJj/DwL0+sTIDgLl5vKEDsL/hpJTaG5nWiRLbcu6Hd+JXovreFUihHtwVJ7zNsPc
-        pass
+        url = 'http://www.szjt.gov.cn/BusQuery/default.aspx?cid=175ecd8d-c39d-4116-83ff-109b946d7cb4'
+        data = {
+            'ctl00$MainContent$StandName': station_name,
+            'ctl00$MainContent$SearchCode': '搜索',
+            '__VIEWSTATE': '/wEPDwULLTE5ODM5MjcxNzlkZAmiJJ2tnI/uORAHha02uiTP20zkcIPFI/03+QRVt2jm',
+            '__VIEWSTATEGENERATOR': '1DDAEB65',
+            '__EVENTVALIDATION': '/wEWBQLCvY65BALq+uyKCAKkmJj/DwL0+sTIDgLl5vKEDsL/hpJTaG5nWiRLbcu6Hd+JXovreFUihHtwVJ7zNsPc'
+        }
+        response = utils.http_post(url, data)
+        return response
 
-    def request_bus_station_data(self, station_name):
-        driver = webdriver.PhantomJS(executable_path=config.phantomjs_path, service_args=['--load-images=no'])
-        # driver = webdriver.Chrome()
-        driver.set_page_load_timeout(40)
-        log.info('爬取公交站台-->获取<{station_name}>站台信息开始'.format(station_name=station_name))
-        try:
-            driver.get("http://www.szjt.gov.cn/BusQuery/default.aspx?cid=175ecd8d-c39d-4116-83ff-109b946d7cb4")
-        except TimeoutException as e:
-            log.warn(e)
-            return None
-        driver.find_element_by_id("MainContent_StandName").send_keys(station_name)
-        driver.find_element_by_id("MainContent_SearchCode").click()
-        time.sleep(0.5)
-        body = driver.page_source
-        log.info('爬取公交站台-->获取<{station_name}>站台信息成功'.format(station_name=station_name))
-        return body
+    # def request_bus_station_data(self, station_name):
+    #     driver = webdriver.PhantomJS(executable_path=config.phantomjs_path, service_args=['--load-images=no'])
+    #     # driver = webdriver.Chrome()
+    #     driver.set_page_load_timeout(40)
+    #     log.info('爬取公交站台-->获取<{station_name}>站台信息开始'.format(station_name=station_name))
+    #     try:
+    #         driver.get("http://www.szjt.gov.cn/BusQuery/default.aspx?cid=175ecd8d-c39d-4116-83ff-109b946d7cb4")
+    #     except TimeoutException as e:
+    #         log.warn(e)
+    #         return None
+    #     driver.find_element_by_id("MainContent_StandName").send_keys(station_name)
+    #     driver.find_element_by_id("MainContent_SearchCode").click()
+    #     time.sleep(0.5)
+    #     body = driver.page_source
+    #     log.info('爬取公交站台-->获取<{station_name}>站台信息成功'.format(station_name=station_name))
+    #     return body
 
     def save_bus_station_data_to_db(self, bus_station: BusStation):
         try:

@@ -15,7 +15,7 @@ class BusRouteService(object):
         pass
 
     def request_bus_route_data(self):
-        response = utils.http_request(constants.URL_BUS_ROUTE, timeout=60)
+        response = utils.http_get(constants.URL_BUS_ROUTE, timeout=60)
         return response.text
 
     def handle_bus_route_data(self, xml_content):
