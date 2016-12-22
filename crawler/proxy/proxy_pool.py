@@ -1,6 +1,7 @@
 import threading
 import time
 from datetime import datetime
+from random import randrange
 
 import pymongo
 from schedule import Scheduler
@@ -33,9 +34,9 @@ class ProxyPool(object):
 		return cls._instance
 
 	def random_choice_proxy(self) -> str:
-		proxy = self.collection.find().sort(
-			[("failed_count", pymongo.ASCENDING), ("validity", pymongo.DESCENDING), ("response_speed", pymongo.ASCENDING),
-			 ("update_time", pymongo.DESCENDING)])
+		count = self.collection.count()
+		offset = randrange(1, count)
+		proxy = self.collection.find().skip(offset).limit(1)
 		return proxy[0]['ip']
 
 	def add_failed_time(self, ip):
