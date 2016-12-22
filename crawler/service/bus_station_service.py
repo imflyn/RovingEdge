@@ -91,11 +91,10 @@ class BusStationService(object):
                     response = requests.post(url, data=data, headers=headers, timeout=8, proxies=proxies)
                     proxy_pool.add_success_time(ip)
                     break
-                except Exception as e:
+                except:
                     log.info('爬取公交站台-->处理<{station_name}>站台，第<{retry_time}>次尝试,使用代理<{ip}>发送Http请求失败'
                              .format(station_name=station_name, ip=ip, retry_time=retry_time))
                     retry_time += 1
-                    log.error(e)
                     proxy_pool.add_failed_time(ip)
         else:
             try:
