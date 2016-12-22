@@ -4,7 +4,6 @@ import requests
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from lxml.etree import XPathEvalError
-from requests.adapters import HTTPAdapter
 
 from common import log, mongodb_service, utils
 from crawler.core import config
@@ -79,9 +78,6 @@ class BusStationService(object):
             'Content-Type': 'application/x-www-form-urlencoded',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
         }
-        session = requests.Session()
-        session.mount('https://', HTTPAdapter(max_retries=2))
-        session.mount('http://', HTTPAdapter(max_retries=2))
         if config.USE_PROXY:
             retry_time = 1
             while True:
@@ -92,7 +88,7 @@ class BusStationService(object):
                 log.info('爬取公交站台-->处理<{station_name}>站台，第<{retry_time}>次尝试,使用代理<{ip}>发送Http请求'.format(station_name=station_name, ip=ip,
                                                                                                       retry_time=retry_time))
                 try:
-                    response = session.post(url, data=data, headers=headers, timeout=8, proxies=proxies)
+                    response = requests.post(url, data=data, headers=headers, timeout=8, proxies=proxies)
                     proxy_pool.add_success_time(ip)
                     break
                 except Exception as e:
@@ -103,7 +99,7 @@ class BusStationService(object):
                     proxy_pool.add_failed_time(ip)
         else:
             try:
-                response = session.post(url, data=data, headers=headers, timeout=20)
+                response = requests.post(url, data=data, headers=headers, timeout=20)
             except Exception as e:
                 log.error(e)
                 return None
