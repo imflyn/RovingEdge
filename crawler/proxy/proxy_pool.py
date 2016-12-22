@@ -1,7 +1,6 @@
 import threading
 import time
 from datetime import datetime
-from random import randrange
 
 import pymongo
 from schedule import Scheduler
@@ -13,7 +12,8 @@ from crawler.proxy import proxy_strategy
 
 TASK_INTERVAL = 60
 FAILED_COUNT_BORDER = 1
-MIN_PROXY_COUNT = 10
+SUCCESS_COUNT_BORDER = 100
+MIN_PROXY_COUNT = 5
 
 REDIS_KEY_LAST_CHECK_IP_TIME = "last_check_ip_time"
 
@@ -34,9 +34,12 @@ class ProxyPool(object):
 		return cls._instance
 
 	def random_choice_proxy(self) -> str:
-		count = self.collection.count()
-		offset = randrange(1, count)
-		proxy = self.collection.find().skip(offset).limit(1)
+		proxy = self.collection.find().sort(
+			[("failed_count", pymongo.ASCENDING), ("validity", pymongo.DESCENDING), ("response_speed", pymongo.ASCENDING),
+			 ("update_time", pymongo.DESCENDING)])
+		# count = self.collection.count()
+		# offset = randrange(1, count)
+		# proxy = self.collection.find().skip(offset).limit(1)
 		return proxy[0]['ip']
 
 	def add_failed_time(self, ip):
@@ -52,7 +55,25 @@ class ProxyPool(object):
 			else:
 				try:
 					self.collection.delete_one({'ip': ip})
-					log.info("ip: %s 已删除" % ip)
+					log.info("ip: %s 失败次数过多已删除" % ip)
+				except:
+					pass
+		self.crawl_proxy_task()
+
+	def add_success_time(self, ip):
+		proxy = self.collection.find_one({'ip': ip})
+		if proxy is not None:
+			success_count = proxy['success_count'] + 1
+			log.info("ip: %s 成功次数+1 已成功次数%s次" % (ip, success_count))
+			if success_count <= SUCCESS_COUNT_BORDER:
+				try:
+					self.collection.update_one({'ip': ip}, {"$set": {'update_time': utils.get_utc_time(), 'success_count': success_count}})
+				except:
+					pass
+			else:
+				try:
+					self.collection.delete_one({'ip': ip})
+					log.info("ip: %s 成功次数过多已删除" % ip)
 				except:
 					pass
 		self.crawl_proxy_task()

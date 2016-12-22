@@ -10,6 +10,7 @@ class Proxy(object):
 		self.create_time = ''
 		self.update_time = ''
 		self.failed_count = 0
+		self.success_count = 0
 
 	@staticmethod
 	def create(ip, origin):
@@ -21,4 +22,5 @@ class Proxy(object):
 		proxy.failed_count = 0
 		proxy.response_speed = -1
 		proxy.validity = False
+		proxy.success_count = 0
 		return proxy
