@@ -92,7 +92,7 @@ class BusStationService(object):
                 log.info('爬取公交站台-->处理<{station_name}>站台，第<{retry_time}>次尝试,使用代理<{ip}>发送Http请求'.format(station_name=station_name, ip=ip,
                                                                                                       retry_time=retry_time))
                 try:
-                    response = session.post(url, data=data, headers=headers, timeout=20, proxies=proxies)
+                    response = session.post(url, data=data, headers=headers, timeout=8, proxies=proxies)
                     proxy_pool.add_success_time(ip)
                     break
                 except Exception as e:
