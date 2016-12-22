@@ -1,9 +1,12 @@
+import threading
 import time
 
+from schedule import Scheduler
 from twisted.internet import reactor
 from twisted.internet.defer import Deferred
 
 from common import log
+from crawler.core import config
 from crawler.service.bus_route_service import BusRouteService
 from crawler.service.bus_station_service import BusStationService
 
@@ -17,7 +20,6 @@ def crawl_bus_route():
 def crawl_bus_station(bus_station_list):
 	def crawl_bus_station(bus_station) -> Deferred:
 		defer = Deferred()
-		time.sleep(3)
 		bus_station_service = BusStationService()
 		bus_station_service.crawl_bus_station_data(bus_station)
 		return defer
@@ -41,5 +43,25 @@ def crawl_bus_station(bus_station_list):
 
 
 if __name__ == '__main__':
+	def task():
+		from crawler.proxy.proxy_pool import proxy_pool
+		if config.USE_PROXY:
+			proxy_pool.start()
+		else:
+			proxy_pool.drop_proxy()
+
+
+	def thread_task():
+		schedule = Scheduler()
+		schedule.every(30).minutes.do(task)
+
+		while True:
+			schedule.run_pending()
+			time.sleep(1)
+
+
+	thread = threading.Thread(target=thread_task)
+	thread.start()
+	task()
 	bus_station_list = crawl_bus_route()
 	crawl_bus_station(bus_station_list)

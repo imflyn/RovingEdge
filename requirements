@@ -5,3 +5,5 @@ flask-RESTful
 requests
 pymongo
 twisted
+redis
+schedule

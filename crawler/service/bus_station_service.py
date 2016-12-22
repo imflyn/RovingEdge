@@ -1,12 +1,15 @@
 import collections
 
+import requests
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from lxml.etree import XPathEvalError
+from requests.adapters import HTTPAdapter
 
 from common import log, mongodb_service, utils
 from crawler.core import config
 from crawler.model.bus_station import BusStation
+from crawler.proxy.proxy_pool import proxy_pool
 
 
 class BusStationService(object):
@@ -76,7 +79,34 @@ class BusStationService(object):
 			'Content-Type': 'application/x-www-form-urlencoded',
 			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
 		}
-		response = utils.http_post(url, data, headers)
+		session = requests.Session()
+		session.mount('https://', HTTPAdapter(max_retries=2))
+		session.mount('http://', HTTPAdapter(max_retries=2))
+		if config.USE_PROXY:
+			retry_time = 1
+			response = None
+			while retry_time <= 5:
+				ip = proxy_pool.random_choice_proxy()
+				proxies = {
+					"http": ip
+				}
+				log.info('爬取公交站台-->处理<{station_name}>站台，第<{retry_time}>次尝试,使用代理<{ip}>发送Http请求'.format(station_name=station_name, ip=ip, retry_time=retry_time))
+				try:
+					response = session.post(url, data=data, headers=headers, timeout=20, proxies=proxies)
+					break
+				except Exception as e:
+					log.info('爬取公交站台-->处理<{station_name}>站台，第<{retry_time}>次尝试,使用代理<{ip}>发送Http请求失败'
+					         .format(station_name=station_name, ip=ip, retry_time=retry_time))
+					retry_time += 1
+					log.error(e)
+					proxy_pool.add_failed_time(ip)
+		else:
+			try:
+				response = session.post(url, data=data, headers=headers, timeout=20)
+			except Exception as e:
+				log.error(e)
+				return None
+		response.encoding = 'utf-8'
 		return response.text
 
 	# def request_bus_station_data(self, station_name):
