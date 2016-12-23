@@ -11,8 +11,8 @@ from crawler.core import config
 from crawler.proxy import proxy_strategy
 
 TASK_INTERVAL = 60
-FAILED_COUNT_BORDER = 1
-SUCCESS_COUNT_BORDER = 100
+FAILED_COUNT_BORDER = 0
+SUCCESS_COUNT_BORDER = 50
 MIN_PROXY_COUNT = 5
 
 REDIS_KEY_LAST_CHECK_IP_TIME = "last_check_ip_time"
