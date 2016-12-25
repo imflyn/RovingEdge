@@ -18,12 +18,9 @@ PORT = 27017
 # MongoDB
 mongodb = mongodb_service.get_db(mongodb_service.get_client(HOST, PORT), DATABASE_NAME)
 
-
 REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
 REDIS_DATABASE_NAME = 0
 
 # Redis
 redis_client = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DATABASE_NAME)
-
-

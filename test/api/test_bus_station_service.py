@@ -3,7 +3,7 @@ import unittest
 from api.service.bus_station_service import BusStationService
 
 
-class TestStationQueryService(unittest.TestCase):
+class TestBusStationService(unittest.TestCase):
     def setUp(self):
         self.bus_station_service = BusStationService()
         pass
