@@ -6,4 +6,16 @@ class BusStation(object):
         self.area = ""  # 沧浪区
         self.road = ""  # 人民路
         self.road_segment = ""  # 南门路-南环路
-        self.rod_direction = ""  # 西
+        self.road_direction = ""  # 西
+
+    @classmethod
+    def create(cls, station_dict):
+        station = BusStation()
+        station.id = station_dict['id']
+        station.name = station_dict['name']
+        station.number = station_dict['number']
+        station.area = station_dict['area']
+        station.road = station_dict['road']
+        station.road_segment = station_dict['road_segment']
+        station.rod_direction = station_dict['road_direction']
+        return station

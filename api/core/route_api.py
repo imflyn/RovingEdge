@@ -1,3 +1,4 @@
+from flask import make_response
 from flask_restful import Resource, reqparse
 
 from api.helper.data_format_converter import Converter
@@ -20,4 +21,4 @@ class RouteApi(Resource):
 
         route_list = self.bus_route_service.query_bus_route_by_name(route_name)
         json = self.converter.convert(route_list)
-        return json
+        return make_response(json, 200)
