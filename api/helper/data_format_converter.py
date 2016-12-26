@@ -1,4 +1,4 @@
-import json
+from flask import jsonify
 
 
 class Converter(object):
@@ -11,4 +11,4 @@ class Converter(object):
 
 class JsonConverter(object):
     def convert(self, list_data):
-        return json.dumps([obj.__dict__ for obj in list_data], ensure_ascii=False)
+        return jsonify([obj.__dict__ for obj in list_data])

@@ -1,5 +1,5 @@
 from flask import Flask
-from flask.ext.restful import Api
+from flask_restful import Api
 
 from api.core.route_api import RouteApi
 from api.core.station_api import StationApi
