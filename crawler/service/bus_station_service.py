@@ -89,6 +89,10 @@ class BusStationService(object):
                                                                                                       retry_time=retry_time))
                 try:
                     response = requests.post(url, data=data, headers=headers, timeout=30, proxies=proxies)
+                    response.encoding = 'utf-8'
+                    if '仿真电子' not in response.text:
+                        raise Exception()
+
                     proxy_pool.add_success_time(ip)
                     break
                 except:
@@ -104,7 +108,6 @@ class BusStationService(object):
                 return None
         if response is None:
             return None
-        response.encoding = 'utf-8'
         return response.text
 
     # def request_bus_station_data(self, station_name):
