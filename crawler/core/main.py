@@ -18,7 +18,7 @@ def crawl_bus_route():
 
 
 def crawl_bus_station(bus_station_list):
-    pool = ThreadPoolExecutor(1)
+    pool = ThreadPoolExecutor(4)
     futures = []
 
     def callbacks_finished():

@@ -58,12 +58,53 @@ class BusStationService(object):
         return station_list
 
     def request_bus_station_data(self, station_name):
-        # http://www.szjt.gov.cn/BusQuery/default.aspx?cid=175ecd8d-c39d-4116-83ff-109b946d7cb4
-        # ctl00$MainContent$StandName 团结桥
-        # ctl00$MainContent$SearchCode 搜索
-        # __VIEWSTATE /wEPDwULLTE5ODM5MjcxNzlkZAmiJJ2tnI/uORAHha02uiTP20zkcIPFI/03+QRVt2jm
-        # __VIEWSTATEGENERATOR 1DDAEB65
-        # __EVENTVALIDATION /wEWBQLCvY65BALq+uyKCAKkmJj/DwL0+sTIDgLl5vKEDsL/hpJTaG5nWiRLbcu6Hd+JXovreFUihHtwVJ7zNsPc
+        url = 'http://www.szjt.gov.cn/apts/default.aspx'
+        data = {
+            'ctl00$MainContent$StandName': station_name,
+            'ctl00$MainContent$SearchCode': '搜索',
+            '__VIEWSTATE': '/wEPDwULLTE5ODM5MjcxNzlkZG5FgcZjEw/Xcik6rLaQKQqjiJG1N/LcEaJpbqk1zMfT',
+            '__VIEWSTATEGENERATOR': '7BCA6D38',
+            '__EVENTVALIDATION': '/wEWBQKV37ujDALq+uyKCAKkmJj/DwL0+sTIDgLl5vKEDjV831PkO9I9rzINcIDwIwK31J8x9g8zuNZKL7+XkZX5'
+        }
+        headers = {
+            'Referer': 'http://www.szjt.gov.cn/apts/default.aspx',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
+        }
+        if config.USE_PROXY:
+            retry_time = 1
+            while True:
+                ip = proxy_pool.random_choice_proxy()
+                proxies = {
+                    "http": ip
+                }
+                log.info('爬取公交站台-->处理<{station_name}>站台，第<{retry_time}>次尝试,使用代理<{ip}>发送Http请求'.format(station_name=station_name, ip=ip,
+                                                                                                      retry_time=retry_time))
+                try:
+                    response = requests.post(url, data=data, headers=headers, timeout=30, proxies=proxies)
+                    response.encoding = 'utf-8'
+                    if '仿真电子' not in response.text:
+                        raise Exception()
+
+                    proxy_pool.add_success_time(ip)
+                    break
+                except:
+                    log.info('爬取公交站台-->处理<{station_name}>站台，第<{retry_time}>次尝试,使用代理<{ip}>发送Http请求失败'
+                             .format(station_name=station_name, ip=ip, retry_time=retry_time))
+                    retry_time += 1
+                    proxy_pool.add_failed_time(ip)
+        else:
+            try:
+                response = requests.post(url, data=data, headers=headers, timeout=20)
+            except Exception as e:
+                log.error(e)
+                return None
+        if response is None:
+            return None
+        return response.text
+
+    def request_bus_station_data2(self, station_name):
         url = 'http://www.szjt.gov.cn/BusQuery/default.aspx?cid=175ecd8d-c39d-4116-83ff-109b946d7cb4'
         data = {
             'ctl00$MainContent$StandName': station_name,
@@ -109,23 +150,6 @@ class BusStationService(object):
         if response is None:
             return None
         return response.text
-
-    # def request_bus_station_data(self, station_name):
-    #     driver = webdriver.PhantomJS(executable_path=config.phantomjs_path, service_args=['--load-images=no'])
-    #     # driver = webdriver.Chrome()
-    #     driver.set_page_load_timeout(40)
-    #     log.info('爬取公交站台-->获取<{station_name}>站台信息开始'.format(station_name=station_name))
-    #     try:
-    #         driver.get("http://www.szjt.gov.cn/BusQuery/default.aspx?cid=175ecd8d-c39d-4116-83ff-109b946d7cb4")
-    #     except TimeoutException as e:
-    #         log.warn(e)
-    #         return None
-    #     driver.find_element_by_id("MainContent_StandName").send_keys(station_name)
-    #     driver.find_element_by_id("MainContent_SearchCode").click()
-    #     time.sleep(0.5)
-    #     body = driver.page_source
-    #     log.info('爬取公交站台-->获取<{station_name}>站台信息成功'.format(station_name=station_name))
-    #     return body
 
     def save_bus_station_data_to_db(self, bus_station: BusStation):
         try:
