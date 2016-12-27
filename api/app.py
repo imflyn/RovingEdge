@@ -10,4 +10,4 @@ api.add_resource(StationApi, StationApi.QUERY_STATION_BY_NAME)
 api.add_resource(RouteApi, RouteApi.QUERY_ROUTE_BY_NAME)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+	app.run(debug=True)
