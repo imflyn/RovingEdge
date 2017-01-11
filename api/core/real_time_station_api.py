@@ -1,3 +1,4 @@
+from flask import make_response
 from flask_restful import Resource, reqparse
 
 from api.helper.data_format_converter import Converter
@@ -18,6 +19,9 @@ class RealTimeStationApi(Resource):
 		args = parser.parse_args()
 		station = args['station']
 
+		real_time_bus_list = []
 		station_list = self.bus_station_service.query_bus_station_by_name(station)
 		for station in station_list:
-			self.bus_station_service.get_real_time_station_data(station)
+			real_time_bus_list.append(self.bus_station_service.get_real_time_station_data(station.number))
+		json = self.converter.convert(real_time_bus_list)
+		return make_response(json, 200)
