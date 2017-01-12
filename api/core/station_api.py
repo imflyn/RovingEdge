@@ -17,9 +17,15 @@ class StationApi(BaseResource):
 	def get(self):
 		parser = reqparse.RequestParser()
 		parser.add_argument('name', type=str)
+		parser.add_argument('fuzzy', type=str)
 		args = parser.parse_args()
 		route_name = args['name']
+		fuzzy = args['fuzzy']
 
-		station_list = self.bus_station_service.query_bus_station_by_name(route_name)
+		if fuzzy and str(fuzzy).lower() == 'true':
+			method = self.bus_station_service.fuzzy_query_bus_station_by_name
+		else:
+			method = self.bus_station_service.query_bus_station_by_name
+		station_list = method(route_name)
 		json = self.converter.convert(station_list)
 		return make_response(json, 200)

@@ -23,6 +23,14 @@ class BusStationService(object):
 			station_list.append(station)
 		return station_list
 
+	def fuzzy_query_bus_station_by_name(self, station_name):
+		station_list = []
+		station_cursor = self.bus_station_collection.find({'name': {'$regex': station_name}})
+		for station_dict in station_cursor:
+			station = BusStation.create(station_dict)
+			station_list.append(station)
+		return station_list
+
 	def get_real_time_station_data(self, number):
 		html = self.request_real_time_station_data(number)
 		real_time_bus_list = self.handle_real_time_station_data(html)

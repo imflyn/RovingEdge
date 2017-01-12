@@ -23,7 +23,7 @@ class RealTimeStationApi(BaseResource):
 		station = args['station']
 
 		real_time_bus_dict = {}
-		station_list = self.bus_station_service.query_bus_station_by_name(station)
+		station_list = self.bus_station_service.fuzzy_query_bus_station_by_name(station)
 		for station in station_list:
 			real_time_station_data = self.bus_station_service.get_real_time_station_data(station.number)
 			if real_time_station_data is None or len(real_time_station_data) == 0:
