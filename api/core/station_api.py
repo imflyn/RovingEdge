@@ -19,13 +19,16 @@ class StationApi(BaseResource):
 		parser.add_argument('name', type=str)
 		parser.add_argument('fuzzy', type=str)
 		args = parser.parse_args()
-		route_name = args['name']
+		state_name = args['name']
 		fuzzy = args['fuzzy']
+
+		if state_name is None:
+			return make_response('', 404)
 
 		if fuzzy and str(fuzzy).lower() == 'true':
 			method = self.bus_station_service.fuzzy_query_bus_station_by_name
 		else:
 			method = self.bus_station_service.query_bus_station_by_name
-		station_list = method(route_name)
+		station_list = method(state_name)
 		json = self.converter.convert(station_list)
 		return make_response(json, 200)

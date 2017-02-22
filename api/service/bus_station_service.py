@@ -23,9 +23,21 @@ class BusStationService(object):
 			station_list.append(station)
 		return station_list
 
-	def fuzzy_query_bus_station_by_name(self, station_name):
+	def fuzzy_query_bus_station_by_name(self, station_name, **kwargs):
+		try:
+			page = kwargs['page']
+		except KeyError:
+			page = None
+		try:
+			offset = kwargs['offset']
+		except KeyError:
+			offset = None
+
 		station_list = []
-		station_cursor = self.bus_station_collection.find({'name': {'$regex': station_name}})
+		if (isinstance(page, int) and page >= 0) and (isinstance(offset, int) and offset > 0):
+			station_cursor = self.bus_station_collection.find({'name': {'$regex': station_name}}).skip(page).limit(offset)
+		else:
+			station_cursor = self.bus_station_collection.find({'name': {'$regex': station_name}})
 		for station_dict in station_cursor:
 			station = BusStation.create(station_dict)
 			station_list.append(station)
