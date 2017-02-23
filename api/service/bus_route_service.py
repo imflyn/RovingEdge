@@ -28,9 +28,9 @@ class BusRouteService(object):
 			offset = None
 		route_list = []
 		if (isinstance(page, int) and page >= 0) and (isinstance(offset, int) and offset > 0):
-			route_cursor = self.bus_route_collection.find({'route_name': {'$regex': route_name}}).skip(page).limit(offset).sort('route_name')
+			route_cursor = self.bus_route_collection.find({'route_name': {'$regex': '^' + route_name}}).skip(page).limit(offset).sort('route_name')
 		else:
-			route_cursor = self.bus_route_collection.find({'route_name': {'$regex': route_name}}).sort('route_name')
+			route_cursor = self.bus_route_collection.find({'route_name': {'$regex': '^' + route_name}}).sort('route_name')
 		for route_dict in route_cursor:
 			route = BusRoute.create(route_dict)
 			route_list.append(route)
