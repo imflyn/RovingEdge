@@ -14,4 +14,4 @@ api.add_resource(RealTimeStationApi, RealTimeStationApi.QUERY_REAL_TIME_STATION_
 api.add_resource(SearchApi, SearchApi.SEARCH)
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(host='192.168.1.102', port=5000, debug=True)

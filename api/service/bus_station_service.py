@@ -35,12 +35,14 @@ class BusStationService(object):
 
 		station_list = []
 		if (isinstance(page, int) and page >= 0) and (isinstance(offset, int) and offset > 0):
-			station_cursor = self.bus_station_collection.find({'name': {'$regex': station_name}}).skip(page).limit(offset)
+			station_cursor = self.bus_station_collection.find({'name': {'$regex': station_name}}).skip(page).limit(offset).sort('name')
 		else:
-			station_cursor = self.bus_station_collection.find({'name': {'$regex': station_name}})
+			station_cursor = self.bus_station_collection.find({'name': {'$regex': station_name}}).sort('name')
 		for station_dict in station_cursor:
 			station = BusStation.create(station_dict)
 			station_list.append(station)
+
+		station_list.sort(key=lambda x: (x.name.startswith(station_name)), reverse=True)
 		return station_list
 
 	def get_real_time_station_data(self, number):
