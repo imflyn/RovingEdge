@@ -1,3 +1,4 @@
+import os
 import sys
 from os.path import dirname
 
@@ -29,7 +30,7 @@ def crawl_bus_station(bus_station_list):
 		callbacks_finished.count += 1
 		log.info("爬取进度-->({index}/{count})".format(index=callbacks_finished.count, count=len(bus_station_list)))
 		if callbacks_finished.count == len(bus_station_list):
-			sys.exit()
+			os._exit(0)
 
 	callbacks_finished.count = 0
 
