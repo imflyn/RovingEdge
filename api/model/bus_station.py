@@ -17,5 +17,5 @@ class BusStation(object):
         station.area = station_dict['area']
         station.road = station_dict['road']
         station.road_segment = station_dict['road_segment']
-        station.rod_direction = station_dict['road_direction']
+        station.road_direction = station_dict['road_direction']
         return station
